@@ -16,11 +16,23 @@
   <a href="#licensing">Licensing</a>
 </p>
 
-The goal of this project is ... _TBD_
+The goal of this project is to combine the ROS1 ( Robot Operating System ) framework with the messaging protocol MQTT to enable ROS1 for a multi robot cloud system. 
 
 ## About this component
+![brokeragearchitecture](https://user-images.githubusercontent.com/104825498/177164087-e678fc00-0527-4d1b-aaaf-1782ff86f607.PNG)
 
-_TBD_
+
+![clientarchitecture](https://user-images.githubusercontent.com/104825498/177164151-5cde4ed8-3a49-43f5-87d4-54e1eb5d6f64.PNG)
+
+ROS message get converted to JSON with soss-json
+MQTT client detects if payload is JSON or MessagePack
+Format of out-going message can be configured system-wide and per interface
+ROS topic are mapped to MQTT topics 1:1
+ROS services have a dynamic mapping to differentiate services clients and requests
+Request: <SERVICE>/request/<UUID>/<COUNTER> (Wildcard/server: <SERVICE>/request/#)
+Response: <SERVICE>/response/<UUID>/<COUNTER> (Wildcard/client: <SERVICE>/response/<UUID>/#)
+Server can handle any reference pattern (instead of <UUID>/<COUNTER>)
+
 
 ## Development
 
