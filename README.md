@@ -24,23 +24,51 @@ The goal of this project is to combine the ROS1 ( Robot Operating System ) frame
 
 ![clientarchitecture](https://user-images.githubusercontent.com/104825498/177164151-5cde4ed8-3a49-43f5-87d4-54e1eb5d6f64.PNG)
 
-ROS message get converted to JSON with soss-json
-MQTT client detects if payload is JSON or MessagePack
-Format of out-going message can be configured system-wide and per interface
-ROS topic are mapped to MQTT topics 1:1
-ROS services have a dynamic mapping to differentiate services clients and requests
-Request: <SERVICE>/request/<UUID>/<COUNTER> (Wildcard/server: <SERVICE>/request/#)
-Response: <SERVICE>/response/<UUID>/<COUNTER> (Wildcard/client: <SERVICE>/response/<UUID>/#)
-Server can handle any reference pattern (instead of <UUID>/<COUNTER>)
+- ROS message get converted to JSON Objects with the soss-json package
+- MQTT client detects if payload is JSON or MessagePack
+- Format of out-going message can be configured system-wide and per interface
+- ROS topics are mapped to MQTT topics 1:1
+- ROS services have a dynamic mapping to differentiate services clients and requests
+- Request: <SERVICE>/request/<UUID>/<COUNTER> (Wildcard/server: <SERVICE>/request/#)
+- Response: <SERVICE>/response/<UUID>/<COUNTER> (Wildcard/client: <SERVICE>/response/<UUID>/#)
+- Server can handle any reference pattern (instead of <UUID>/<COUNTER>)
 
+## Package overview
+- **soss-mqtt (plugin)**
+    - MQTT v3 (v5 would be possible)
+    - SSL support
+    - User/password authentication
+    - Plan JSON (text) or MessagePack (binary)
+    - Topics and Services
+- **mqtt-client (executable)**
+    - Automatic configuration for ROS1 and/or ROS2
+    - Runs SOSS with plugins
+    - Automatic prefixing (optional)
+- **mqtt-client-ros1 (example)**
+    - Depends on soss-ros1 and std_msgs/srvs
+- **mqtt-client-ros2 (example)**
+    - Depends on soss-ros2 and std_msgs/srvs
 
 ## Development
 
 _TBD_
 
-### Build
+### Build mqtt-client-ros1
 
-_TBD_
+- **Install dependencies**
+    - sudo apt install libboost-program-options-dev libyaml-cpp-dev libssl-dev
+    - sudo apt install python3-colcon-common-extensions
+- **Create catkin workspace (example: ~/soss_ws/)**
+    - mkdir –p ~/soss_ws/src
+- **Copy the contents of this archive into ~/soss_ws/src**
+- **Clone upstream dependencies**
+    - cd ~/soss_ws/src
+    - git clone https://github.com/ipa-mdl/soss_v2.git
+    - git clone https://github.com/ipa-mdl/soss-ros1.git
+- **Build (example: ROS1 noetic)**
+    - cd ~/soss_ws
+    - . /opt/ros/noetic/setup.bash
+    - colcon build --packages-up-to mqtt-client-ros1
 
 ## Code of Conduct
 
