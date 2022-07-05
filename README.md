@@ -15,7 +15,7 @@
   <a href="#licensing">Licensing</a>
 </p>
 
-The goal of this project is to combine the ROS1 ( Robot Operating System ) framework with the messaging protocol MQTT to enable ROS1 for a multi robot cloud services. 
+The goal of this project is to combine the ROS1 ( Robot Operating System ) framework with the messaging protocol MQTT to enable ROS1 for multi robot cloud services. 
 
 ## About this component
 ![brokeragearchitecture](https://user-images.githubusercontent.com/104825498/177164087-e678fc00-0527-4d1b-aaaf-1782ff86f607.PNG)
