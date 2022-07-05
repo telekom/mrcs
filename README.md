@@ -24,7 +24,7 @@ The goal of this project is to combine the ROS1 ( Robot Operating System ) frame
 
 ![clientarchitecture](https://user-images.githubusercontent.com/104825498/177164151-5cde4ed8-3a49-43f5-87d4-54e1eb5d6f64.PNG)
 
-- ROS message get converted to JSON Objects with the soss-json package
+- ROS messages get converted to JSON Objects with the soss-json package
 - MQTT client detects if payload is JSON or MessagePack
 - Format of out-going message can be configured system-wide and per interface
 - ROS topics are mapped to MQTT topics 1:1
@@ -48,11 +48,8 @@ The goal of this project is to combine the ROS1 ( Robot Operating System ) frame
     - Depends on soss-ros1 and std_msgs/srvs
 - **mqtt-client-ros2 (example)**
     - Depends on soss-ros2 and std_msgs/srvs
-
+    
 ## Development
-
-_TBD_
-
 ### Build mqtt-client-ros1
 
 - **Install dependencies**
@@ -69,6 +66,39 @@ _TBD_
     - cd ~/soss_ws
     - . /opt/ros/noetic/setup.bash
     - colcon build --packages-up-to mqtt-client-ros1
+    
+### Running the mqtt-client
+Start the following applications in different terminals:
+
+- Install and start mosquito MQTT broker
+    - sudo apt install mosquitto
+    - mosquitto
+- Monitor all MQTT messages
+    - sudo apt install mosquitto-clients
+    - mosquitto_sub -v -t '#'
+- Start ROS master
+    - . /opt/ros/noetic/setup.bash
+    - roscore
+- Start mqtt-client with test configuration (needs “test” scope)
+    - cd ~/soss_ws
+    - . install/setup.bash
+    - mqtt-client --address localhost --scope test src/mqtt-client/test/client.yml
+    
+### Testing the mqtt-client
+Start the following applications in different terminals:
+- Publish to ROS topic
+    - . /opt/ros/noetic/setup.bash
+    - rostopic pub /out std_msgs/String "data: 'hello-world'" -r 1
+- Subscribe to ROS topic
+    - . /opt/ros/noetic/setup.bash
+    - rostopic echo /in
+- Start test service (“local_service”, std_srvs/Trigger)
+    - cd ~/soss_ws
+    - . install/setup.bash
+    - python3 src/mqtt-client/test/service1.py
+- Call test service
+    - . /opt/ros/noetic/setup.bash
+    - rosservice call /remote_service
 
 ## Code of Conduct
 
@@ -80,9 +110,6 @@ We decided to apply _English_ as the primary project language.
 
 Consequently, all content will be made available primarily in English. We also ask all interested people to use English as language to create issues, in their code (comments, documentation etc.) and when you send requests to us. The application itself and all end-user facing content will be made available in other languages as needed.
 
-## Documentation
-
-The full documentation for the telekom can be found in _TBD_
 ## Support and Feedback
 The following channels are available for discussions, feedback, and support requests:
 
