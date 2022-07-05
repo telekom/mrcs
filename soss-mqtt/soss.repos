@@ -1,0 +1,5 @@
+repositories:
+  soss:
+    type: git
+    url: https://github.com/ipa-mdl/soss_v2.git
+    version: master

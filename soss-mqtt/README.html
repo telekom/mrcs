@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>soss-mqtt</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="soss-mqtt">soss-mqtt</h1>
+<p>This package implements a <a href="https://mqtt.org/">MQTT</a> extension for <a href="https://github.com/osrf/soss">SOSS (System Of Systems Synthesizer )</a> using the <a href="https://github.com/eclipse/paho.mqtt.cpp">Eclipse Paho MQTT C++ library</a>. SOSS is configured by a YAML file (see section <a href="#configuration">Configuration</a>), where the user can setup a complex system composed of different middlewares and map topics and services between them.</p>
+<h2 id="principle">Principle</h2>
+<p><code>soss-mqtt</code> is not meant to be used with arbitrary MQTT systems, but rather to provide a (scalable) brokerage layer for SOSS as depicted in the following diagram:</p>
+<figure>
+<img src="doc/soss-mqtt.png" alt="broker architecture" /><figcaption>broker architecture</figcaption>
+</figure>
+<p>In order to support SOSS topics and services on top of MQTT topics, this plugin implements a <a href="#mapping">custom topic mapping</a> to differentiate the operations and to track the meta-data. All SOSS messages are converted to JSON objects and can be transmitted as text (for debugging) or <a href="https://msgpack.org/">MessagePack</a> (default).</p>
+<h2 id="installation">Installation</h2>
+<p><code>soss-mqtt</code> depends on <a href="https://github.com/osrf/soss">SOSS</a> and has to be built from source.</p>
+<ol type="1">
+<li>Install dependencies</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">sudo</span> apt-get install libboost-program-options-dev libyaml-cpp-dev libssl-dev python3-colcon-common-extensions python3-vcstool</a></code></pre></div>
+<ol start="2" type="1">
+<li>Import SOSS repositories</li>
+</ol>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">vcs</span> import <span class="op">&lt;</span> soss-mqtt/soss.repos</a></code></pre></div>
+<ol start="3" type="1">
+<li>Build</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">colcon</span> build --packages-up-to soss-mqtt</a></code></pre></div>
+<h2 id="usage">Usage</h2>
+<p>An example <a href="doc/test.yml"><code>test.yml</code></a> file is shown below:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">systems:</span></a>
+<a class="sourceLine" id="cb4-2" title="2">    <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="kw">{</span><span class="fu">type:</span><span class="at"> mqtt</span><span class="kw">,</span> <span class="fu">address:</span><span class="at"> </span><span class="st">&quot;tcp://localhost:1883&quot;</span><span class="kw">}</span></a>
+<a class="sourceLine" id="cb4-3" title="3">    <span class="fu">ros:</span><span class="at"> </span><span class="kw">{</span><span class="fu">type:</span><span class="at"> ros2</span><span class="kw">}</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="fu">topics:</span></a>
+<a class="sourceLine" id="cb4-5" title="5">    <span class="fu">out:</span></a>
+<a class="sourceLine" id="cb4-6" title="6">        <span class="fu">type:</span><span class="at"> </span><span class="st">&quot;std_msgs/String&quot;</span></a>
+<a class="sourceLine" id="cb4-7" title="7">        <span class="fu">route:</span><span class="at"> </span><span class="kw">{</span><span class="fu">from:</span><span class="at"> ros</span><span class="kw">,</span> <span class="fu">to:</span><span class="at"> mqtt_broker</span><span class="kw">}</span></a>
+<a class="sourceLine" id="cb4-8" title="8">        <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="kw">{</span><span class="fu">json_indent:</span><span class="at"> </span><span class="dv">2</span><span class="kw">}</span></a></code></pre></div>
+<p>It connects a MQTT broker (e.g. mosquitto) and ROS2. The broker and a test client can be installed with: <code>sudo apt-get mosquitto mosquitto-clients</code>. To build <code>soss-ros2</code> (e.g. ROS2 foxy) and <code>soss-mqtt</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="bu">source</span> /opt/ros/foxy/setup.bash</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">colcon</span> build --packages-up-to soss-mqtt soss-ros2 soss-ros2-test</a></code></pre></div>
+<p>The following steps need to be run in different terminals (or in the background): 1. start mosquitto (with default settings):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">mosquitto</span></a></code></pre></div>
+<blockquote>
+<p>mosquitto version 1.6.9 starting<br/> Using default config.<br/> Opening ipv4 listen socket on port 1883.<br/> Opening ipv6 listen socket on port 1883.</p>
+</blockquote>
+<ol start="2" type="1">
+<li>publish to <code>ROS</code> topic <code>out</code></li>
+</ol>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="bu">source</span> install/setup.bash</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="ex">ros2</span> topic pub /out std_msgs/msg/String <span class="st">&quot;data: Hello world!&quot;</span></a></code></pre></div>
+<blockquote>
+<p>publisher: beginning loop<br/> publishing #​1: std_msgs.msg.String(data=‘Hello world!’)</p>
+</blockquote>
+<ol start="3" type="1">
+<li>run the <code>soss</code> executable with the above configuration:</li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="bu">source</span> install/setup.bash</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">soss</span> src/soss-mqtt/doc/test.yml</a></code></pre></div>
+<blockquote>
+<p>Connected to tcp​://localhost:1883<br/> Publishing to topic out with type: std_msgs/String and QOS: 0</p>
+</blockquote>
+<ol start="4" type="1">
+<li>subscribe to MQTT topic:</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">mosquitto_sub</span> -t <span class="st">&quot;out&quot;</span></a></code></pre></div>
+<blockquote>
+<p>{<br/> “msg”: {<br/> “data”: “Hello world!”<br/> },<br/> “op”: “publish”,<br/> “type”: “std_msgs/String”<br/> }</p>
+</blockquote>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>SOSS</code> configuration file is explained in detail in <a href="https://github.com/osrf/soss/blob/master/doc/concept.md">SOSS concept</a>. This section explains the configuration specific to <code>soss-mqtt</code>.</p>
+<h3 id="system">System</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb10-1" title="1"><span class="fu">systems:</span></a>
+<a class="sourceLine" id="cb10-2" title="2">    <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="kw">{</span><span class="fu">type:</span><span class="at"> mqtt</span><span class="kw">,</span> <span class="fu">address:</span><span class="at"> </span><span class="st">&quot;tcp://localhost:1883&quot;</span><span class="kw">,</span> <span class="fu">qos:</span><span class="at"> </span><span class="dv">0</span><span class="kw">,</span> <span class="fu">json_indent:</span><span class="at"> </span><span class="dv">2</span><span class="kw">}</span></a></code></pre></div>
+<p><code>address (no default)</code>: The address of the server to connect to, specified as a URI (see <a href="https://github.com/eclipse/paho.mqtt.cpp#supported-network-protocols">supported protocol</a>).</p>
+<p><code>client_id</code> (default: ""): Unique client ID. If it is empty, a unique id will be randomly generated at each (re)connection.</p>
+<p><code>qos</code> (default: 0): <a href="https://www.hivemq.com/blog/mqtt-essentials-part-6-mqtt-quality-of-service-levels/">Quality of Service</a> can be set for either for overall system or for each <code>topic</code> individually. <code>MQTT</code> defines three levels of QOS: * QoS 0: At most once delivery; provides no guarantee of delivery * QoS 1: At least once delivery * QoS 2: Exactly once delivery; safest and slowest quality of service level</p>
+<p>If a <code>client_id</code> is set, all topics with QOS &gt; 0 will be <a href="https://www.hivemq.com/blog/mqtt-essentials-part-7-persistent-session-queuing-messages/">persisted in the session</a>, i.e. the broker will queue messages during connection losses as long as soss does not get restarted.</p>
+<p><code>json_indent</code> (default: -2): Configures the <code>JSON</code> indentation level, where * -2: binary transmission as <a href="https://msgpack.org/index.html">MessagePack</a> * -1: compact text (without any whitespace) * 0: newlines only * N: pretty-print (with N spaces per level)</p>
+<h4 id="authentication">Authentication</h4>
+<p><code>MQTT</code> protocol provides username and password for authentication as an application level security. The client has the option to send a username and password when it connects to an <code>MQTT</code> broker. <code>username</code>: UTF-8 encoded string. <code>password</code>: Binary data with a maximum of 65535 bytes. To configure the <code>mosquitto</code> broker for username and password restrictions, please refer <a href="http://www.steves-internet-guide.com/mqtt-username-password-example/">here</a>. Once the broker has been configured, the <code>soss-mqtt</code> plugin has to be provided with <code>username</code> and <code>password</code> keys in the configuration file in the following manner:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb11-1" title="1"><span class="fu">systems:</span></a>
+<a class="sourceLine" id="cb11-2" title="2">  <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="kw">{</span> <span class="fu">type:</span><span class="at"> mqtt</span><span class="kw">,</span> <span class="fu">address:</span><span class="at"> </span><span class="st">&quot;tcp://localhost:1884&quot;</span><span class="kw">,</span> <span class="fu">username:</span><span class="at"> user</span><span class="kw">,</span> <span class="fu">password:</span><span class="at"> password </span><span class="kw">}</span></a></code></pre></div>
+<h4 id="ssl-tls">SSL / TLS</h4>
+<p><code>MQTT</code> broker can be configured to establish an SSL/TLS connection with its clients. Two scenatios are possible: - <em>Server authentication</em>: The client needs the digital certificate of the server. It is included in the “trust store”. - <em>Mutual authentication</em>: Both client and server are authenticated during the SSL handshake. In addition to the digital certificate of the server in a trust store, the client will need its own digital certificate and the private key used to sign its digital certificate stored in a “key store”.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">systems:</span></a>
+<a class="sourceLine" id="cb12-2" title="2">  <span class="fu">mqtt:</span><span class="at"> </span><span class="kw">{</span> <span class="fu">type:</span><span class="at"> mqtt</span><span class="kw">,</span> <span class="fu">address:</span><span class="at"> </span><span class="st">&quot;ssl://localhost:8883&quot;</span><span class="kw">,</span></a>
+<a class="sourceLine" id="cb12-3" title="3">          <span class="fu">truststore:</span><span class="at"> certs/server.crt</span><span class="kw">,</span></a>
+<a class="sourceLine" id="cb12-4" title="4">          <span class="fu">keystore:</span><span class="at"> certs/client.crt</span><span class="kw">,</span></a>
+<a class="sourceLine" id="cb12-5" title="5">          <span class="fu">private_key:</span><span class="at"> certs/client.key</span><span class="kw">}</span></a></code></pre></div>
+<p><code>trust_store</code>: Server’s public certificate trusted by the client.<br />
+The following setting(s) are required if the broker has been configured for mutual authentication, as described above.<br />
+<code>key_store</code>: Client’s public certificate chain. It may also include the client’s private key.<br />
+<code>private_key</code> - If not included in <code>key_store</code>, this setting points to client’s private key.<br />
+<code>private_keypassword</code>: The password to load the client’s <code>private_key</code> if encrypted.</p>
+<p>All paths can be absolute or relative to the config file or the home directory.</p>
+<h4 id="persistence">Persistence</h4>
+<p><code>soss-mqtt</code> will reconnect to the broker after a connection was lost, but published messages will be lost in between. However, it is possible to buffer them and publish after the reconnection.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb13-1" title="1"><span class="fu">systems:</span></a>
+<a class="sourceLine" id="cb13-2" title="2">    <span class="fu">mqtt_broker:</span></a>
+<a class="sourceLine" id="cb13-3" title="3">      <span class="fu">type:</span><span class="at"> mqtt</span></a>
+<a class="sourceLine" id="cb13-4" title="4">      <span class="fu">address:</span><span class="at"> </span><span class="st">&quot;tcp://localhost:1883&quot;</span></a>
+<a class="sourceLine" id="cb13-5" title="5">      <span class="fu">send_while_disconnected:</span><span class="at"> </span><span class="ch">true</span></a>
+<a class="sourceLine" id="cb13-6" title="6">      <span class="fu">max_buffered_messages:</span><span class="at"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb13-7" title="7">      <span class="fu">persist_qos0:</span><span class="at"> </span><span class="ch">false</span></a></code></pre></div>
+<p><code>send_while_disconnected</code> (default: false): buffer outgoing message during discnnections.</p>
+<p><code>max_buffered_messages</code> (default: 100): number of messages to be bufferred, additional messages will be dropped.</p>
+<p><code>persist_qos0</code> (default: false): buffer QOS 0 messages as well</p>
+<h3 id="topics">Topics</h3>
+<p>Both, <code>qos</code> and <code>json_indent</code>, can be specified for each indiviual topic as well, which override the system’s default:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb14-1" title="1"><span class="fu">topics:</span></a>
+<a class="sourceLine" id="cb14-2" title="2">    <span class="fu">out:</span></a>
+<a class="sourceLine" id="cb14-3" title="3">        <span class="fu">type:</span><span class="at"> </span><span class="st">&quot;std_msgs/String&quot;</span></a>
+<a class="sourceLine" id="cb14-4" title="4">        <span class="fu">route:</span><span class="at"> </span><span class="kw">{</span><span class="fu">from:</span><span class="at"> ros</span><span class="kw">,</span> <span class="fu">to:</span><span class="at"> mqtt_broker </span><span class="kw">}</span></a>
+<a class="sourceLine" id="cb14-5" title="5">        <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="kw">{</span> <span class="fu">qos:</span><span class="at"> </span><span class="dv">2</span><span class="at"> </span><span class="kw">}</span></a>
+<a class="sourceLine" id="cb14-6" title="6">        <span class="fu">remap:</span><span class="at"> </span><span class="kw">{</span> <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="st">&quot;test/out&quot;</span> <span class="kw">}</span></a></code></pre></div>
+<h3 id="services">Services</h3>
+<p>Service support individual settings for <code>qos</code> and <code>json_indent</code>as well, but in contrast to topics the <code>qos</code> defaults to 1.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb15-1" title="1"><span class="fu">services:</span></a>
+<a class="sourceLine" id="cb15-2" title="2">    <span class="fu">add_two_ints:</span></a>
+<a class="sourceLine" id="cb15-3" title="3">        <span class="fu">type:</span><span class="at"> </span><span class="st">&quot;rospy_tutorials/AddTwoInts&quot;</span></a>
+<a class="sourceLine" id="cb15-4" title="4">        <span class="fu">route:</span><span class="at"> </span><span class="kw">{</span> <span class="fu">server:</span><span class="at"> ros</span><span class="kw">,</span> <span class="fu">clients:</span><span class="at"> mqtt_broker </span><span class="kw">}</span></a>
+<a class="sourceLine" id="cb15-5" title="5">        <span class="fu">mqtt_broker:</span><span class="at"> </span><span class="kw">{</span> <span class="fu">qos:</span><span class="at"> </span><span class="dv">0</span><span class="at"> </span><span class="kw">}</span></a></code></pre></div>
+<h2 id="mapping">Mapping</h2>
+<p><code>soss-mqtt</code> converts SOSS messages into JSON objects, which can be sent as text or <a href="https://msgpack.org/">MessagePack</a> (default). To distinguish the different operations, SOSS topics are mapped differently.</p>
+<h3 id="topics-1">Topics</h3>
+<p><code>SOSS</code> topics get mapped to <code>MQTT</code> topics as specified in the configuation file (topic name or remap). The message format should match up to the message definition on the target system. For example, for a topic of type <a href="http://docs.ros.org/en/melodic/api/std_msgs/html/msg/String.html">std_msgs/String</a>, the message format should be</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb16-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb16-2" title="2">  <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="st">&quot;Hello world&quot;</span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="fu">}</span></a></code></pre></div>
+<h3 id="services-1">Services</h3>
+<p>For services a dynamic mapping is used, which reflects the reference id of the call.</p>
+<p>Service requests should be sent to <code>&lt;SERVICE&gt;/request/&lt;REFERENCE&gt;</code>, where <code>&lt;SERVICE&gt;</code> is the (remapped) name from the configuration and <code>&lt;REFERENCE&gt;</code> is the unqiue reference id. The response will be returned to <code>&lt;SERVICE&gt;/response/&lt;REFERENCE&gt;</code>.</p>
+<p>In <code>soss-mqtt</code> each service client has a <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a> and tracks all service calls with a reference counter, so <code>&lt;REFERENCE&gt;</code> is <code>&lt;UUID&gt;/&lt;COUNTER&gt;</code>. This allows the use of <a href="https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/">wildcard subscriptions</a> to <code>&lt;SERVICE&gt;/response/&lt;UUID&gt;/#</code> for clients and <code>&lt;SERVICE&gt;/request/#</code> for servers.</p>
+<p>Example: Service <code>ns1/ns2/my_service</code> of type type <a href="http://docs.ros.org/en/api/std_srvs/html/srv/SetBool.html">std_srvs/SetBool</a></p>
+<p>Request is sent to <code>ns1/ns2/my_service/request/00112233-4455-6677-8899-aabbccddeeff/0</code> (first call):</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb17-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb17-2" title="2">  <span class="dt">&quot;data&quot;</span> <span class="fu">:</span> <span class="kw">true</span></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="fu">}</span></a></code></pre></div>
+<p>Response will be sent to <code>ns1/ns2/my_service/response/00112233-4455-6677-8899-aabbccddeeff/0</code>:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb18-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb18-2" title="2">  <span class="dt">&quot;success&quot;</span> <span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb18-3" title="3">  <span class="dt">&quot;message&quot;</span> <span class="fu">:</span> <span class="st">&quot;Device enabled&quot;</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="fu">}</span></a></code></pre></div>
+</body>
+</html>

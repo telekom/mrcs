@@ -1,0 +1,14 @@
+systems:
+  broker: { type: mqtt, address: "ssl://localhost:8883",
+            truststore: certs/server.crt,
+            keystore: certs/client.crt,
+            private_key: certs/client.key}
+  mock: { type: mock }
+
+routes:
+  mock_to_broker: { from: mock, to: broker }
+  broker_to_mock: { from: broker, to: mock }
+
+topics:
+  to_broker_roundtrip_ssl: { type: "mqtt_test/Data", route: mock_to_broker, remap: {broker: bounce_roundtrip_ssl}}
+  from_broker_roundtrip_ssl: { type: "mqtt_test/Data", route: broker_to_mock, remap: {broker: bounce_roundtrip_ssl}}

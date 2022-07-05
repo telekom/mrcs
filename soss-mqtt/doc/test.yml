@@ -1,0 +1,12 @@
+systems:
+    mqtt_broker: {type: mqtt, address: "tcp://localhost:1883"}
+    ros: {type: ros2}
+topics:
+    out:
+        type: "std_msgs/String"
+        route: {from: ros, to: mqtt_broker}
+        mqtt_broker: {json_indent: 2}
+services:
+    add_two_ints:
+        type: "rospy_tutorials/AddTwoInts"
+        route: { server: ros, clients: mqtt_broker }

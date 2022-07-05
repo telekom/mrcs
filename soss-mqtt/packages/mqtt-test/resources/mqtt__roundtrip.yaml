@@ -1,0 +1,11 @@
+systems:
+  broker: { type: mqtt, address: tcp://localhost:1883 }
+  mock: { type: mock }
+
+routes:
+  mock_to_broker: { from: mock, to: broker }
+  broker_to_mock: { from: broker, to: mock }
+
+topics:
+  to_broker_roundtrip: { type: "mqtt_test/Data", route: mock_to_broker, remap: {broker: bounce_roundtrip}}
+  from_broker_roundtrip: { type: "mqtt_test/Data", route: broker_to_mock, remap: {broker: bounce_roundtrip}}

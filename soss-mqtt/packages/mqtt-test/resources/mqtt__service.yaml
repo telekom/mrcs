@@ -1,0 +1,11 @@
+systems:
+  broker: { type: mqtt, address: tcp://localhost:1883 }
+  mock: { type: mock }
+
+routes:
+  mock_srv: {server: mock, clients: broker }
+  broker_srv: {server: broker, clients: mock }
+
+services:
+  to_mock_roundtrip: { type: "mqtt_test/AddTwoInts", route: mock_srv, remap: {broker: bounce_roundtrip} }
+  to_broker_roundtrip: { type: "mqtt_test/AddTwoInts", route: broker_srv, remap: {broker: bounce_roundtrip} }
