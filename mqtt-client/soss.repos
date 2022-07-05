@@ -1,0 +1,13 @@
+repositories:
+  soss:
+    type: git
+    url: https://github.com/ipa-mdl/soss_v2.git
+    version: feature/ros2-concurrency
+  soss-ros1:
+    type: git
+    url: https://github.com/ipa-mdl/soss-ros1.git
+    version: master
+  soss-mqtt:
+    type: git
+    url: git@gitlab.cc-asp.fraunhofer.de:ipa326/soss-mqtt.git
+    version: master

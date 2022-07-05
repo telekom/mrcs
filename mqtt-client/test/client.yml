@@ -1,0 +1,14 @@
+ros:
+  threads: 0
+
+publishers:
+    out: { type: "std_msgs/String" }
+
+subscribers:
+    in: { type: "std_msgs/String", remap: "test/out" }
+
+servers:
+    local_service: { type: "std_srvs/Trigger", remap: "test/service" }
+
+clients:
+    remote_service: { type: "std_srvs/Trigger", remap: "test/service" }
