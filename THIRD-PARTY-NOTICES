@@ -1,11 +1,21 @@
 ThirdPartyNotices
 -----------------
 mrcs uses third-party software or other resources that may be distributed 
-under licenses different from corona-warn-app/cwa-verification-portal software.
+under licenses different from mrcs software.
 
 In the event that we overlooked to list a required notice, please bring this
-to our attention by contacting us via this email: opensource@telekom.de
-
+to our attention by contacting us via this email: christoph.stielow@telekom.de
 
 Components:
+
+*Paho MQTT Client URL: https://github.com/eclipse/paho.mqtt.c License: Eclipse Distribution License 1.0 (BSD) Eclipse Public License 1.0
+*python3-colcon-common-extensions URL: https://github.com/colcon/colcon-common-extensions License: ASL 2.0
+*libboost-program-options-dev URL: https://salsa.debian.org/debian/boost-defaults/-/tree/master/debian License: MIT 
+*libyaml-cpp-dev URL: https://github.com/jbeder/yaml-cpp License: MIT
+*libssl-dev URL: https://salsa.debian.org/debian/boost-defaults/-/tree/master/debian License: OpenSSL
+*ROS URL: https://github.com/ros/ros/blob/noetic-devel/LICENSE License: BSD-3-Clause
+*soss_v2 URL: https://github.com/mathias-luedtke/soss_v2 License: ASL 2.0
+*soss-ros1 URL: https://github.com/mathias-luedtke/soss-ros1 License: ASL 2.0
+*catch2 URL: https://github.com/catchorg/Catch2 License: BSL-1.0 license 
+
 -----------
