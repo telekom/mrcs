@@ -67,7 +67,7 @@ The goal of this project is to combine the ROS1 ( Robot Operating System ) frame
     - colcon build --packages-up-to mqtt-client-ros1
     
 ### Running the mqtt-client
-Start the following applications in different terminals:
+Run these steps in different terminals:
 
 - Install and start mosquito MQTT broker
     - sudo apt install mosquitto
@@ -84,7 +84,7 @@ Start the following applications in different terminals:
     - mqtt-client --address localhost --scope test src/mqtt-client/test/client.yml
     
 ### Testing the mqtt-client
-Start the following applications in different terminals:
+Run these steps in different terminals:
 - Publish to ROS topic
     - . /opt/ros/noetic/setup.bash
     - rostopic pub /out std_msgs/String "data: 'hello-world'" -r 1
