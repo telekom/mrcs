@@ -1,5 +1,5 @@
 <h1 align="center">
-    Multi Robot Cloud Services
+    Multi Robot Cloud Service
 </h1>
 
 <p align="center">
