@@ -74,6 +74,7 @@ Run these steps in different terminals:
 - Install and start mosquito MQTT broker
     - sudo apt install mosquitto
     - mosquitto
+        - if this step shows `Error: Address already in use` then it is possible that the broker is already running
 - Monitor all MQTT messages
     - sudo apt install mosquitto-clients
     - mosquitto_sub -v -t '#'
@@ -83,7 +84,7 @@ Run these steps in different terminals:
 - Start mqtt-client with test configuration (needs “test” scope)
     - cd ~/soss_ws
     - . install/setup.bash
-    - mqtt-client --address localhost --scope test src/mqtt-client/test/client.yml
+    - mqtt-client --address localhost --scope test src/mrcs/mqtt-client/test/client.yml
     
 ### Testing the mqtt-client
 Run these steps in different terminals:
@@ -96,7 +97,7 @@ Run these steps in different terminals:
 - Start test service (“local_service”, std_srvs/Trigger)
     - cd ~/soss_ws
     - . install/setup.bash
-    - python3 src/mqtt-client/test/service1.py
+    - python3 src/mrcs/mqtt-client/test/service1.py
 - Call test service
     - . /opt/ros/noetic/setup.bash
     - rosservice call /remote_service
