@@ -56,7 +56,9 @@ The goal of this project is to combine the ROS1 ( Robot Operating System ) frame
     - sudo apt install python3-colcon-common-extensions
 - **Create catkin workspace (example: ~/soss_ws/)**
     - mkdir –p ~/soss_ws/src
-- **Copy the contents of this archive into ~/soss_ws/src**
+- **Clone the contents of this archive into ~/soss_ws/src**
+    - cd ~/soss_ws/src
+    - git clone https://github.com/telekom/mrcs.git
 - **Clone upstream dependencies**
     - cd ~/soss_ws/src
     - git clone https://github.com/ipa-mdl/soss_v2.git
